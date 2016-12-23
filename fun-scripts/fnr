@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# I don't know why I tried to write this in bash...
+DIR="$1"
+FIND="$2"
+echo Find $FIND
+REPLACE="$3"
+echo Replace with $REPLACE
+
+IGNORE_DIRS=${@:4}
+ignoredirs=`strjoin -p " ! -path " $IGNORE_DIRS`
+echo Ignoring directories: $IGNORE_DIRS
+echo $ignoredirs
+timestamp=`date -Ins`
+master=$HOME/fnr_diffs/master-$timestamp
+temp=$HOME/fnr_diffs/temp-$timestamp
+find $DIR -type f $ignoredirs ! -name '*.d' ! -name '*.dd' -print0 | while read -d $'\0' filename
+do
+  if [[ "`file -bi $filename`" =~ "text" ]] ; then
+    emphasize $filename >> $master
+    #>$temp sed 's/"$FIND"/"$REPLACE"/g' $filename
+    >$temp sed "s/$FIND/$REPLACE/g" $filename
+    if [ $? -eq 0 ] ; then
+      diff -y --suppress-common-lines $filename $temp -W  $(( $(tput cols) - 2 )) >> $master
+    else
+      echo >&2 "Warning: Problem performing replace at $filename"
+    fi
+    #rm -r $temp
+  fi
+done
+
+echo Viewing diff..
+less -NR $master
+echo Diff closed
+
+echo 'Do you want to perform the actual find/replace? [N]O, [Y]es'
+read acceptable
+if [[ x"$acceptable" =~ "^x(Y$|Yes$|YES$|y$|yes$)" ]] ; then
+  echo Performing replacement
+  find $DIR -type f $ignoredirs ! -name '*.d' ! -name '*.dd' -print0 | while read -d $'\0' filename
+  do
+    if [[ "`file -bi $filename`" =~ "text" ]] ; then
+      sed -i "s/$FIND/$REPLACE/g" $filename
+    fi
+  done
+  echo Complete!
+fi

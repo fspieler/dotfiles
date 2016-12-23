@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#echo "last 5 files - "
+last1="$(ls -1rt $** | tail -1)"
+waittime=3
+echo ---------------------------------------------------------------------------
+echo "in $waittime secs, will tail -f ${last1}"
+echo ---------------------------------------------------------------------------
+sleep $waittime
+tail -f ${last1}

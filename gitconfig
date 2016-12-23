@@ -1,0 +1,22 @@
+[user]
+   name = Fred Spieler
+   email = fspieler@gmail.com
+[core]
+   preloadindex = true
+   excludesfile = $HOME/.gitignore_global
+[push]
+   default = simple
+[color]
+   ui = auto
+   diff = auto
+[diff]
+   tool = vimdiff
+[difftool]
+   prompt = false
+[alias]
+   d = difftool
+   cl = clone
+   lol = log --graph --oneline --decorate "${@:2}"
+   log = log --name-status "${@:2}"
+   s = status
+   qs = status -uno

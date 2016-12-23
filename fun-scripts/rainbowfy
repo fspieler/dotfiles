@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# light green background on rainbow
+ColorBegin="\033[1;48;8;29;38;5;"
+ColorEnd="m"
+BBlack=${ColorBegin}16$ColorEnd
+BRed=${ColorBegin}196$ColorEnd
+BOrange=${ColorBegin}202$ColorEnd
+BYellow=${ColorBegin}226$ColorEnd
+BGreen=${ColorBegin}82$ColorEnd
+BCyan=${ColorBegin}81$ColorEnd
+BBlue=${ColorBegin}27$ColorEnd
+BDarkPurple=${ColorBegin}92$ColorEnd
+BPurple=${ColorBegin}164$ColorEnd
+#BWhite=${ColorBegin}231$ColorEnd
+
+txtrst="\033[0m"       # Text Reset
+
+colors=($BRed $BOrange $BYellow $BGreen $BCyan $BBlue $BDarkPurple $BPurple)
+
+ansi_escape=no
+if [ "$1" == - ] ; then
+  ansi_escape_begin='\['
+  ansi_escape_end='\]'
+  ansi_escape=yes
+  shift
+fi
+
+numcolors=${#colors[*]}
+input="$@"
+size=${#input}
+output=
+START=$(($RANDOM & 127))
+for (( i=0; i<$size; i++ )); do
+  ii=`expr $START + $i`
+  char=${input:$i:1}
+  output+=$ansi_break_begin${colors[ $(( $ii & 7 )) ]}$ansi_break_end$char
+  #output+=${colors[ $(( $ii & 7 )) ]}$char
+done
+
+if [ "$ansi_escape" == yes ] ; then
+  echo -n $output$ansi_break_begin$txtrst$ansi_break_end
+else
+  echo -ne $output$txtrst
+fi

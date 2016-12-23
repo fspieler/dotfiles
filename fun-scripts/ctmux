@@ -1,0 +1,13 @@
+#!/bin/bash
+
+tmux_run () {
+
+tmux -2uS  ~/.tmux.socket.$HOSTNAME "$@"
+}
+
+if [[ $# -eq 0 ]] ; then
+   tmux_run a -t 0
+   if [[ $? -eq 1 ]] ; then
+      tmux_run
+   fi
+fi

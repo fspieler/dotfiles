@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ $# -gt 1 ] ; then
+  arg="$(ls -1rt $@ | tail -1)"
+else
+  arg=$1
+fi
+if [ ${arg: -3} == ".gz" ] ; then
+  gzless -NR $arg
+else
+  less -NR $arg
+fi

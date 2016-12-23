@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ $# -eq 1 ] ; then
+  remaining="."
+else
+  remaining="${@:2}"
+fi
+
+egrep $1 -r -i -n --include=*.{cpp,h,c} "$remaining"

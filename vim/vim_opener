@@ -1,0 +1,25 @@
+#!/bin/bash
+
+ARGS="$@"
+
+FILES=""
+
+for arg in $ARGS; do
+  if [ ! -f $arg ] ; then
+    EXPANDED_ARGS=*$arg*
+    EXISTING_FILES=`filter_filenames $EXPANDED_ARGS | egrep -v '\.o|\.tsk|\.bak|\.d'`
+    if [ -z $EXISTING_FILES ] ; then
+      FILES="$FILES $arg"
+    else
+      #make it so cpp/h pairs are together but header first
+      EXISTING_FILES=`echo $EXISTING_FILES | tr ' ' '\n' | sort -t $'.' -u -k1,1 -k2,2r | tr '\n' ' '`
+      echo $EXISTING_FILES
+      FILES="$FILES $EXISTING_FILES"
+    fi
+  else
+    FILES="$FILES $arg"
+  fi
+
+done
+
+vim -O $FILES

@@ -1,0 +1,101 @@
+#!/opt/bb/bin/bash
+
+if [ $# -lt 3 ] ; then
+  type=class
+else
+  type=$3
+fi
+
+lower_name=${1,,}_${2,,}
+upper_name=${1^^}_${2^^}
+header_str=$(cat <<EOF
+#ifndef ${upper_name}_INCLUDE_GUARD
+#define ${upper_name}_INCLUDE_GUARD
+
+namespace Spielcrest
+{
+
+namespace $1
+{
+
+$type $2
+{
+
+}; // $type $2
+
+} // namespace $1
+
+} // namespace Spielcrest
+
+#endif // ${upper_name}_INCLUDE_GUARD
+EOF
+)
+
+cpp_str=$(cat <<EOF
+#include <$lower_name.h>
+#include <bael_log.h>
+
+namespace
+{
+  const char LOG_CATEGORY[] = "$upper_name";
+}
+
+namespace Spielcrest
+{
+
+namespace $1
+{
+
+} // namespace $1
+
+} // namespace Spielcrest
+EOF
+)
+
+test_str=$(cat <<EOF
+#include <$lower_name.h>
+
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <bael_log.h>
+
+namespace
+{
+  const char LOG_CATEGORY[] = "TEST_$upper_name";
+}
+
+namespace Spielcrest
+{
+
+namespace $1
+{
+
+  TEST(${2},test_case)
+  {
+    $2 t_${2,};
+  } //test_case
+
+} //namespace $1
+
+} //namespace Spielcrest
+EOF
+)
+
+
+
+#Debug lines
+#echo -e "${header_str}" 
+#echo -e "${cpp_str}" 
+
+if [ -f "$1".h ] ; then
+  echo "$1".h already exists... exiting
+  exit 1
+elif [ -f "1".cpp ] ; then
+  echo "$1".cpp already exists... exiting
+  exit 1
+fi
+
+echo -e "${header_str}" > "$lower_name".h
+echo -e "${cpp_str}" > "$lower_name".cpp
+echo -e "${test_str}" > "$lower_name".t.cpp
+

@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ "$1" == "-r" ] ; then
+  echo  -e "\033[1;05;41;37mXXX \033[00;1;41;37m${@:2} \033[05;41;37mXXX\033[0m" #red on white
+elif [ "$1" == "-b" ] ; then
+  echo  -e "\033[1;44;37m${@:2}\033[0m" #blue on white
+else
+  echo  -e "\033[1;47;30m${@}\033[0m" #black on white
+fi

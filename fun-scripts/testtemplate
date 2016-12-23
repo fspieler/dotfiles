@@ -1,0 +1,42 @@
+#!/bin/bash
+
+type=class
+ 
+destination=$1
+header=$2
+shift
+
+package=$(egrep -o "^namespace \S*" $header | grep -v Spielcrest | head -n 1 | sed 's/namespace //g')
+class=$(egrep -o "^class \S*" $header | head -n 1 | sed 's/class //g')
+upper_name=${package^^}_${class^^}
+
+test_str=$(cat <<EOF
+#include <$header>
+
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+namespace
+{
+  const char LOG_CATEGORY[] = "TEST_$upper_name";
+}
+
+namespace Spielcrest
+{
+
+namespace $package
+{
+
+  TEST(${class},test_case)
+  {
+    $class t_${class,};
+  } //test_case
+
+} //namespace $package
+
+} //namespace Spielcrest
+EOF
+)
+
+echo -e "${test_str}" > $destination
+

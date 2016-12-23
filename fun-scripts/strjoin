@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# if first arg is -p, an extra delimiter will precede output
+if [ x"$1" == x"-p" ] ; then
+  firstflag=false;
+  shift
+else
+  firstflag=true
+fi
+delim=$1
+final=""
+for i in ${@:2} ; do
+  if [ $firstflag = true ] ; then
+    final=$i
+    firstflag=false
+  else
+    final=$final${delim}$i
+  fi
+done
+
+echo $final

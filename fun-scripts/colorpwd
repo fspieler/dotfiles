@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# credit to Jim Mahood for vastly improving this!
+
+bash_colorpwd() {
+  #init colors
+  typeset -a COLORS=(160 196 202 208 214 220 226)
+  typeset -i NUMCOLORS=${#COLORS[*]}
+  typeset slash='/'
+
+  #get path
+  typeset DIR=${PWD//$HOME/\~}
+  typeset -a DIRS
+  IFS='/' read -ra DIRS <<< "$DIR"
+  typeset -i NUMDIRS=${#DIRS[*]}
+  typeset -i NUM_INITIAL_VALS=$NUMCOLORS-$NUMDIRS
+  typeset -i count=0
+  typeset -i last_count=${NUMDIRS}-1
+  typeset -i index
+
+  typeset ansi_escape=no
+  if [ "$1" == '-' ] ; then
+    ansi_escape=yes
+    shift
+  fi
+
+  for i in "${DIRS[@]}" ; do
+    let index=$count+$NUM_INITIAL_VALS
+    [[ $index -lt  0 ]] && index=0
+    if [[ $count = $last_count ]]; then
+      slash=''
+      [[ $i = '' ]] && i='/' # special case for when pwd == '/'
+    fi
+    if [ "$ansi_escape" == 'yes' ] ; then
+      echo -ne "\033[38;5;${COLORS[$index]}m$i$slash"
+    else
+      echo -ne "\033[38;5;${COLORS[$index]}m$i$slash"
+    fi
+    let count=$count+1
+  done
+  if [ "$ansi_escape" == 'yes' ] ; then 
+    echo -ne "\033[0m"
+  else
+    echo -ne "\033[0m"
+  fi
+}
+
+[[ ${0##/*/} != 'bash' ]] && bash_colorpwd "$@" && echo
+

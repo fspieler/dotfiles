@@ -1,0 +1,10 @@
+#!/bin/bash
+signal=15
+if [[ "$1" == "-"* ]] ; then
+  signal=${1#-}
+  echo $signal
+  shift
+  echo $1
+fi
+echo $1
+ps -ef $1 | grep $USER | grep -v vim | tr -s ' ' | cut -d ' ' -f 2 | xargs kill -$signal

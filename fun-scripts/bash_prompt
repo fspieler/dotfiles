@@ -1,0 +1,231 @@
+#!/bin/bash
+
+# { colors
+bldblu='\[\033[1;34m\]' # Blue
+bldblk='\[\033[1;38;5;16m\]' # Black - Bold
+white='\[\033[1;38;5;188m\]'
+gray='\[\033[1;38;5;247m\]'
+AMBER='\[\033[1;38;5;214m\]'
+FOREST='\[\033[1;38;5;29m\]'
+light_green='\[\033[1;38;5;46m\]'
+BIBlue='\[\033[1;94m\]'       # Blue
+BlinkGold='\[\033[5;38;5;136m\]'
+BabyBlue='\[\033[1;38;5;51m\]'
+Red='\[\033[1;38;5;196m\]'
+FlashingRed_nobr='\033[1;5;48;5;196;37m'
+Red_nobr='\033[1;48;5;196;37m'
+# backgrounds
+white_bg='\[\033[39m\]'
+white_bg_nobr='\033[39m'
+# Reset
+Color_Off='\[\033[0m\]'       # Text Reset
+Color_Off_nobr='\033[0m'       # Text Reset
+# } end colors
+
+export HISTCONTROL=ignoreboth
+HISTSIZE=
+HISTFILESIZE=
+
+# { exit status function
+exit_status_fcn () {
+  status=$?
+  if [ $status != 0 ] ; then
+    echo -ne "${FlashingRed_nobr}X${Color_Off_nobr}${Red_nobr}$status${Color_Off_nobr} "
+  fi
+}
+# }
+
+# { define individual colored components
+if [[ -z $PROMPT_PROFILE_PATH ]] || [[ ! -f $PROMPT_PROFILE_PATH ]] ; then
+  echo No bash_prompt profile found\; please define PROMPT_PROFILE_PATH env variable
+else
+  echo Using bash_prompt profile: $PROMPT_PROFILE_PATH
+  source $PROMPT_PROFILE_PATH
+fi
+initialize_component_color () {
+  eval color_var=\$$1"_color"
+  export $1='\['"${color_var}"'\]'"${@:2}"'\[\033[0m\]'
+  unset color_var
+}
+bg_jobs () {
+  jobnum=$(jobs -p | wc -l)
+  [[ $jobnum -gt 0 ]] && ( [[ $jobnum -gt 1 ]] && echo "$jobnum bg jobs " || echo "1 bg job " )
+}
+initialize_component_color time_12h "\T"
+initialize_component_color time_12a "\@"
+initialize_component_color time_24h "\t"
+initialize_component_color username "\u"
+username_rainbow="\$(rainbowfy $USER)"
+username_rainbow_fixed="$(rainbowfy $USER)"
+initialize_component_color path_short "\W"
+initialize_component_color path_full_abbr "\w"
+initialize_component_color path_full "\$(pwd)"
+path_full_gradient="\$(colorpwd)$Color_Off"
+initialize_component_color bg_job_num "\$(bg_jobs)"
+initialize_component_color hist "!\!"
+initialize_component_color at_hostname "@\h"
+initialize_component_color machine_num ":$MACHINE_NUMBER"
+initialize_component_color parent_machine "$PARENT_HOSTNAME_COND"
+initialize_component_color git "\$(__git_ps1 ' (%s)')"
+initialize_component_color end_gt_nl "\n> "
+initialize_component_color end_gt " > "
+initialize_component_color end_dollar_nl "\n$ "
+initialize_component_color end_dollar " $ "
+initialize_component_color end_octo_nl "\n$ "
+initialize_component_color end_octo " # "
+exit_status="\$(exit_status_fcn)"
+# } end individual colored components
+
+# { define bash_history functions
+backup_timestamp () {
+  date +%F
+}
+
+recover_bash_history () { #takes parameter of which backup file to recover
+  if [ $# -ne 1 ] ; then
+    echo "$FUNCNAME requires exactly one argument: the backup file to recover from" >&2
+    return 1
+  elif [ ! -f $1 ] ; then
+    echo "$1 is not a valid file" >&2
+    return 2
+  fi
+
+  if [ x"$BASH_HIST_BAK_DIR" == x ] ; then
+    echo "BASH_HIST_BAK_DIR not set... please set this environment variable!" >&2
+    exit 1
+  fi
+  local backup_dir=${BASH_HIST_BAK_DIR}
+  local backup_name=$backup_dir/recovery-$(backup_timestamp)
+  cp ~/.bash_history $backup_name
+  echo "Created $backup_name, note that multiple recoveries per day will clobber backups."
+  diff --unchanged-line-format='%L' --old-line-format='%L' --new-line-format='%L' ~/.bash_history $1 > $backup_dir/temp
+  if [ $? -ge 2 ] ; then
+    echo "$FUNCNAME: error running diff" >&2
+    return 3
+  fi
+  mv $backup_dir/temp ~/.bash_history
+}
+
+autorecover_bash_history () { #recovers bash history with the latest log file
+  if [ x"$BASH_HIST_BAK_DIR" == x ] ; then
+    echo "BASH_HIST_BAK_DIR not set... please set this environment variable!" >&2
+    exit 1
+  fi
+  local backup_dir=${BASH_HIST_BAK_DIR}
+  local todays_backup_name=$backup_dir/backup-$(backup_timestamp)
+  local latest_backup=$(ls -t $backup_dir/backup* | head -n1)
+  if [ `wc -l < ~/.bash_history` -lt `wc -l < $latest_backup` ] ; then
+    recover_bash_history $latest_backup
+  fi
+
+  #create backup for today if it doesn't already exist
+  if [ ! -f $todays_backup_name ] ; then
+    cp ~/.bash_history $todays_backup_name
+  fi
+}
+# } define bash_history functions
+
+# { set prompt functions
+set_bash_prompt () {
+  export PS1=$current_ps1
+  echo -en "\033]0;$HOSTNAME: $PWD\007"
+  autorecover_bash_history
+}
+
+hist_toggle () {
+  if [ x"$PROMPT_HISTORY_FLAG" == xon ] ; then
+    PROMPT_HISTORY_FLAG=off
+    PROMPT_COMMAND="set_bash_prompt; history -a;"
+    echo "history synchronizing DISABLED"
+  else
+    PROMPT_HISTORY_FLAG=on
+    PROMPT_COMMAND="set_bash_prompt; history -a; history -c; history -r"
+    echo "history synchronizing ENABLED"
+  fi
+}
+if [ x"$PROMPT_COMMAND" == x ] ; then
+  hist_toggle
+fi
+
+# inserts timestamp into bash_history
+export HISTTIMEFORMAT='%F %T '
+
+# wrapper around `history` that adds color, and greps arguments if the first is not a number and doesn't begin with '-'
+# FIXME hard-coded color values in awk commands
+history () {
+
+  local number_re='^[0-9]+$'
+  if [[ ! "$@" == -*  ]] ; then
+    if [ $# -ge 1 ] ; then
+      if [[ "$@" =~ $number_re ]] ; then
+        command history "$@" | awk '{printf "\033[1;38;5;241m%s %s %s\033[0m", $1, $2, $3; for(i=4;i<=NF;i++){printf " %s", $i}; printf "\n";}'
+      else
+        local search=$(strjoin '/ && /' $@)
+        command history | awk '/'"$search"'/' | awk '{printf "\033[1;38;5;241m%s %s %s\033[0m", $1, $2, $3; for(i=4;i<=NF;i++){printf " %s", $i}; printf "\n";}'
+      fi
+    else
+      command history | awk '{printf "\033[1;38;5;241m%s %s %s\033[0m", $1, $2, $3; for(i=4;i<=NF;i++){printf " %s", $i}; printf "\n";}'
+    fi
+  else
+    command history "$@"
+  fi
+}
+
+# { define prompts
+set_prompts >/dev/null 2>&1
+
+backup_ps1="\n$exit_status$hist $time_12a $username$at_hostname$machine_num $path_full_abbr$end_gt_nl"
+if [[ 0 -eq ${#ps1_list[*]} ]] ; then
+  ps1_list=(backup_ps1)
+fi
+# } end define prompts
+
+change_ps1 () {
+  : ${ps1_list_index:=-1}
+  local ps1num=${#ps1_list[*]}
+  eval current_ps1=\$${ps1_list[0]}
+  [[ $ps1_list_index -ge 0 ]] && echo Current PS1: ${ps1_list[ $ps1_list_index ]}
+  echo Available prompts: ${ps1_list[*]}
+  [[ $ps1_list_index -eq -1  ]] && ps1_list_index=$(( $ps1num-1))
+  local temp_index=$(( ($ps1_list_index + 1) % $ps1num))
+  local count=0
+  while [[ $count -lt $ps1num ]] ;
+  do
+    local temp_ps1_name=${ps1_list[$temp_index]}
+    echo Trying prompt: $temp_ps1_name
+    eval temp_prompt=\$$temp_ps1_name
+    if [[ -z $temp_prompt ]] ; then
+      echo No prompt found...
+    else
+      eval cond=\$$temp_ps1_name"_condition"
+      if [[ ! -z $cond ]] ; then
+        echo Cond: $cond
+        ( eval "$cond" ) >/dev/null 2>&1
+        if [ $? -eq 0 ] ; then
+          echo Prompt condition succeeded
+          ps1_list_index=$temp_index
+          current_ps1=$temp_prompt
+          return 0
+        else
+          echo Prompt condition failed
+        fi
+      else
+        echo No prompt condition: automatic success
+        ps1_list_index=$temp_index
+        current_ps1=$temp_prompt
+        return 0
+      fi
+    fi
+    temp_index=$(( ($temp_index + 1) % $ps1num))
+    count=$(( $count + 1 ))
+  done
+  echo No prompt succeeded... falling back to backup >&2
+  current_ps1=$backup_ps1
+  ps1_list_index=-1
+  return 1
+}
+# } end prompt functions
+
+# { set initial prompt
+change_ps1
+# } end initial prompt

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for arg in "$@"; do
+  if [ -f $arg ]; then
+    echo $arg
+  elif [ -h $arg ]; then
+    FOLLOW_LINK="`readlink -f $arg`"
+    if [ -f $FOLLOW_LINK  ] ; then
+      echo $arg
+    fi
+  fi
+done

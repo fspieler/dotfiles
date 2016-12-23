@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# open and source this file :) {
+alias vba="\vim ~/.bash_aliases"
+alias sb="source ~/.bashrc"
+# }
+
+# navigate "special" directories {
+alias bin="cd ~/bin"
+alias dot="cd ~/dot-files"
+alias fun="cd ~/dot-files/fun-scripts"
+alias tmp="cd ~/tmp"
+# }
+
+# time ones {
+#alias make="time make"
+# }
+
+# bash utils wrappers {
+alias ll='ls -hla --color=yes'
+alias sl="ls --color=yes"
+alias rm="rm -i"
+alias less='less -NR'
+alias nl="nl -nrn -w9"
+#alias time=awesome_time
+alias vim="vim_opener"
+alias ivim=vim
+alias tmux="tmux -2uS  ~/.tmux.socket"
+alias psef="ps -ef | grep"
+alias lvl="echo $SHLVL"
+#}
+
+# functions {
+mkcd () {
+  mkdir -p $1 && cd $1
+}
+
+cdcat () {
+   cd `cat "$@"`
+}
+#}
