@@ -57,8 +57,6 @@ syntax on
 "   hi xmlTagName ctermfg=1
 "   hi xmlTag ctermfg=1
 "   hi xmlEndTag ctermfg=1
-hi LineNr       term=bold cterm=bold ctermfg=DarkRed
-hi CursorLineNr term=bold cterm=bold ctermfg=Gray ctermbg=Magenta
 
 "colors & fonts
 colorscheme solarized
@@ -164,7 +162,7 @@ map <F5> :echo 'Current time is ' . strftime('%c')<CR>
 "  :20  :  up to 20 lines of command-line history will be remembered
 "  %    :  saves and restores the buffer list
 "  n... :  where to save the viminfo files
-set viminfo='20,\"100,:20,%,n~/.viminfo
+set viminfo='20,"100,:20,%,n~/.viminfo
 
 function! ResCur()
     if line("'\"") <= line("$")
@@ -217,6 +215,8 @@ set novisualbell
 " display line numbers
 set number
 set relativenumber
+hi LineNr       term=bold cterm=bold ctermfg=DarkRed
+hi CursorLineNr ctermfg=White ctermbg=DarkRed
 
 " minimal number of columns to use for the line number (default: 4)
 set numberwidth=4

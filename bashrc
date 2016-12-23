@@ -26,7 +26,6 @@ LS_DIR="di=$FPREF;213"
 LS_LINK="ln=$FPREF;81"
 LS_PIPE="pi=$FPREF;196"
 LS_EXE="ex=$FPREF;88"
-LS_MK="*.make=$FPREF;82:*.mk=$FPREF;82:Makefile*=$FPREF;82:makefile*:$FPREF;82"
 LS_SOCKET="so=$FPREF;164"
 LS_SOURCE_FILE="$BPREF;16" # black backround
 LS_OBJECT_FILE="$BPREF;238"
@@ -37,7 +36,7 @@ LS_PY="*.py=$LS_SOURCE_FILE"
 LS_D="*.d=$LS_OBJECT_FILE"
 LS_DD="*.dd=$LS_OBJECT_FILE"
 LS_O="*.o=$LS_OBJECT_FILE"
-export LS_COLORS=$LS_DIR:$LS_LINK:$LS_PIPE:$LS_EXE:$LS_SOCKET:$LS_MK:$LS_CPP:$LS_H:$LS_C:$LS_PY:$LS_D:$LS_DD:$LS_O
+export LS_COLORS=$LS_DIR:$LS_LINK:$LS_PIPE:$LS_EXE:$LS_SOCKET:$LS_CPP:$LS_H:$LS_C:$LS_PY:$LS_D:$LS_DD:$LS_O
 
 # } end ls colors
 
@@ -54,3 +53,15 @@ shopt -s checkjobs #warn about stopped and bg jobs before closing shell
 shopt -s histappend #append to hist file
 shopt -s histverify #don't immediately run history substitutions
 # } et al.
+
+#{ custom bash prompt -- GENERATED - CAN BE DELETED
+if [[ -d /home/fred/.bash_history_backups ]] && [[ -f /home/fred/dotfiles/fun-scripts/bash_prompt ]] ; then
+  export PATH=/home/fred/dotfiles/fun-scripts:$PATH
+  export PROMPT_PROFILE_PATH=/home/fred/dotfiles/color_profile
+  export BASH_HIST_BAK_DIR=/home/fred/.bash_history_backups
+  export ps1_list_index=-1
+  source /home/fred/dotfiles/fun-scripts/bash_prompt
+fi
+#} end custom bash prompt -- END GENERATED
+
+ patriotismbot

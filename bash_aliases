@@ -13,7 +13,7 @@ alias make="time make"
 alias ls="ls --color=auto"
 alias ll='ls -hla'
 alias sl="ls"
-alias rm="rm -i"
+alias rm="trash-put"
 alias less='/opt/bb/bin/less -NR'
 alias nl="nl -nrn -w9"
 alias time=awesome_time
