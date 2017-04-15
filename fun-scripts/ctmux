@@ -1,13 +1,16 @@
 #!/bin/bash
 
-tmux_run () {
+session=0
+if [[ $# -ge 1 ]] ; then
+   session=$1
+   shift
+fi
 
-tmux -2uS  ~/.tmux.socket.$HOSTNAME "$@"
+tmux_run () {
+   tmux -2uS  ~/.tmux.socket.$HOSTNAME.$session "$@"
 }
 
-if [[ $# -eq 0 ]] ; then
-   tmux_run a -t 0
-   if [[ $? -eq 1 ]] ; then
-      tmux_run
-   fi
+tmux_run a -t $session
+if [[ $? -eq 1 ]] ; then
+   tmux_run new -s $session
 fi
