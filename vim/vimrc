@@ -441,7 +441,7 @@ nnoremap tp :tabp<CR>
 nnoremap te :tabe<space>
 
 " from normal mode, insert space and stay in normal mode
-nnoremap <space> i <esc>
+nnoremap <space> .
 
 " autocomplete tab instead of Ctrl-N
 " inoremap <tab> <C-N>
@@ -477,6 +477,7 @@ nnoremap '' ``
 " keep a line highlighted after indenting in visual mode
 vnoremap < <gv
 vnoremap > >gv
+
 " }
 
 " Abbreviations {
