@@ -102,10 +102,10 @@ len2=${#msg2_unformatted}
 # ensure bars are long enough
 max () { printf "%s\n" "$@" | sort -g | tail -n1;  }
 short_bar_length=$(max 30 $(expr $len1 + 2)  $(expr $len2 + 2))
-long_bar_length=`expr $short_bar_length + 21` #21 is length of stars portion
+long_bar_length=`expr $short_bar_length + 22` #22 is length of stars portion
 
-six_star=$white_on_blue"$star   $star   $star   $star   $star   $star"$color_off
-five_star=$white_on_blue"  $star   $star   $star   $star   $star  "$color_off
+six_star=$white_on_blue"$star   $star   $star   $star   $star   $star "$color_off
+five_star=$white_on_blue"  $star   $star   $star   $star   $star   "$color_off
 short=$(printf "%${short_bar_length}s")
 short_red_bars=$white_on_red$short$nl
 short_white_bars=$red_on_white$short$nl
