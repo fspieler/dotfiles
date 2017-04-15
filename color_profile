@@ -1,0 +1,134 @@
+#!/bin/bash
+
+# This file provides an example for how to configure your bash PS1 prompt
+# using the prompt at bash_prompt bbgithub:fspieler/fun-scripts
+
+# It is recommended that you copy this file and set an environment variable
+# that points to that copy.
+
+# The following prompt variables have matching colors that can be set in set_colors:
+# Prompt Variable  |    Color variable     |   Description
+# =====================================================================================
+# time_12h         |        time_12h_color | 12-hour clock: 10:23:42
+# time_12a         |        time_12a_color | 12-hour clock: 09:10 AM
+# time_24h         |        time_24h_color | 24-hour clock: 17:02:21
+# username         |        username_color | username, ie $USER
+# path_short       |      path_short_color | current directory name
+# path_full        |       path_full_color | fully expanded directory name
+# path_full_abbr   |  path_full_abbr_color | fully expanded directory name, with $HOME
+#                  |                       |   replaced by '~'
+# bg_job_num       |      bg_job_num_color | prints "n bg jobs " if there are bg jobs
+# hist             |            hist_color | prints the current history num, eg "!432"
+# at_hostname      |     at_hostname_color | current machine, eg "@sundev30"
+# machine_num      |     machine_num_color | machine num prefixed with ':', eg ":495"
+# parent_machine   |  parent_machine_color | if ssh'd from another machine, print
+#                  |                       |   "(machinename) "
+# git              |             git_color | if in git repository, print 
+#                  |                       |   "(branchname) "
+# end_octo_nl      |     end_octo_nl_color | print "\n# "
+# end_octo         |        end_octo_color | print "# "
+# end_dollar_nl    |   end_dollar_nl_color | print "\n$ "
+# end_dollar       |      end_dollar_color | print "$ "
+# end_gt_nl        |       end_gt_nl_color | print "\n$ "
+# end_gt           |          end_gt_color | print "$ "
+
+# There are also several variables defined that invoke functions:
+#   $username_rainbow -> prints username with random rainbow pattern that changes
+#   $username_rainbow_fixed -> prints username with random rainbow pattern
+#   $path_full_gradient -> prints path with customizable gradient
+# These variables depend on the implementing scripts being placed on the path.
+# It is recommended to use a one of the end*nl variables to place the input cursor
+#   on a new line when using one of these functions, because they do not escape
+#   colors correctly, and strange behavior may result.
+
+# If you define your own variables, and add color, you should remember to escape
+# the color by appending $color_off to the variable. This is not strictly necesssary
+# but probably good form.
+
+# You can include your own function calls in a prompt easily.
+# Example code:
+#   numfilesindir="\$(find . -maxdepth 1 -type f | wc -l)"
+# If you omit the leading '\', this will cause the function to be run once when the
+#   prompt is created.
+#
+# Try changing colors that are set in set_colors and prompts that are set in
+# set_prompts. Note that the bash_prompt script will source this file and then run
+# `set_prompts` after applying color variables.
+
+define_color () {
+  echo '\033[1;38;5;'${1}'m'
+}
+
+set_colors () {
+  # helper code for setting colors
+
+  local red=$(define_color 196)
+  local dark_red=$(define_color 88)
+  local orange=$(define_color 208)
+  local yellow=$(define_color 226)
+  local dark_yellow=$(define_color 214)
+  local green=$(define_color 28)
+  local light_green=$(define_color 46)
+  local dark_green=$(define_color 29)
+  local blue=$(define_color 21)
+  local dark_blue=$(define_color 19)
+  local light_blue=$(define_color 51)
+  local purple=$(define_color 54)
+  local pink=$(define_color 206)
+  local brown=$(define_color 130)
+
+  #grayscale
+  local black=$(define_color 232)
+  local gray=$(define_color 247)
+  local dark_gray=$(define_color 241)
+  local white=$(define_color 188)
+
+  #uses default color
+  local color_off="\[\033[0m\]"
+
+  # PS1 PROMPT colors
+  time_12h_color=$white
+  time_12a_color=$white
+  time_24h_color=$white
+  username_color=$orange
+  path_short_color=$red
+  path_full_color=$red
+  path_full_abbr_color=$red
+  bg_job_num_color=$dark_red
+  hist_color=$dark_gray
+  at_hostname_color=$red
+  git_color=$light_blue
+  end_gt_nl_color=$color_off
+  end_gt_color=$color_off
+  end_dollar_nl_color=$color_off
+  end_dollar_color=$color_off
+  end_octo_nl_color=$color_off
+  end_octo_color=$color_off
+
+  #exit_status_color=
+  #path_full_gradient_colors=()
+}
+
+set_colors
+
+set_prompts () {
+  # any of the color variables defined in the sample `set_colors` have matching variables that can be used
+  # to define prompts
+  # If you want a prompt to be considered, it's variable name needs to be included in an array named "ps1"
+  # You can also provide a variable that has the same name as the prompt with "_condition" appended that
+  # act as a condition (or predicate) for whether to select that prompt.
+  # For example, if git is not present on a machine, running $git_ps1_condition will return a non-zero
+  # error code, so $git_ps1 will be removed from consideration. This ensures that prompt will only be chosen
+  # on machines that support git.
+  full_ps1="\n$exit_status$hist $bg_job_num$time_12h $username_rainbow$at_hostname $path_full_gradient$git $end_gt_nl"
+  git_condition="type __git_ps1"
+  rainbowfy_condition="type rainbowfy"
+  colorpwd_condition="type colorpwd"
+  full_ps1_condition="$git_condition && $rainbowfy_condition && $colorpwd_condition"
+  full_minus_git_ps1="\n$exit_status$hist $bg_job_num$time_12h $username_rainbow$at_hostname $path_full_gradient$end_gt_nl"
+  full_minus_git_ps1_condition="( ! $git_condition ) && $rainbowfy_condition && $colorpwd_condition"
+  git_small_ps1="\n$username$at_hostname $path_short$git$end_gt"
+  git_small_ps1_condition="$git_condition"
+  safe_ps1="$username$at_hostname $path_short$end_gt"
+  ps1_list=(full_ps1 full_minus_git_ps1 git_small_ps1 safe_ps1)
+}
