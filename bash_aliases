@@ -14,7 +14,7 @@ alias ls="ls --color=auto"
 alias ll='ls -hla'
 alias sl="ls"
 alias rm="trash-put"
-alias less='/opt/bb/bin/less -NR'
+alias less='less -NR'
 alias nl="nl -nrn -w9"
 alias time=awesome_time
 alias vim="vim_opener"
