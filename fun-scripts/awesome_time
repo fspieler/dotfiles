@@ -1,14 +1,14 @@
 #!/bin/bash
 
 function parse_time () {
-  file=$1
-  tail -n 3 $file | grep real | egrep -o [0-9]+\.[0-9]+
+    file=$1
+    tail -n 3 $file | grep real | egrep -o [0-9]+\.[0-9]+
 }
 
 TIME_OUTPUT_DIR=~/.time.output
 if [ $# -eq 0  ] ; then
-  emphasize -r "awesome_time needs to run with arguments"
-  return 1
+    emphasize -r "awesome_time needs to run with arguments"
+    return 1
 fi
 
 COMMAND=`strjoin _ $@`
@@ -16,7 +16,7 @@ EXPANDED_DIR=`readlink -f $PWD`
 EXPANDED_DIR=${EXPANDED_DIR//\//%}
 WORKING_DIR="$TIME_OUTPUT_DIR/$OSTYPE/$EXPANDED_DIR/$COMMAND"
 if [ ! -d $WORKING_DIR ] ; then
-  mkdir -p $WORKING_DIR
+    mkdir -p $WORKING_DIR
 fi
 
 # print header
@@ -32,7 +32,7 @@ echo -e "$INVERTCOLORS"$HR$COLOR_OFF >> $LOGFILE
 
 # display history, if available
 if [ -f $WORKING_DIR/fastest_time ] ; then
-  emphasize "Fastest previous run: `cat $WORKING_DIR/fastest_time`, slowest: `cat $WORKING_DIR/slowest_time`"
+    emphasize "Fastest previous run: `cat $WORKING_DIR/fastest_time`, slowest: `cat $WORKING_DIR/slowest_time`"
 fi
 
 # run command
@@ -41,32 +41,32 @@ fi
 # get status
 STATUS=${PIPESTATUS[0]}
 if [ $STATUS -ne 0 ] ; then
-  cp $LOGFILE $WORKING_DIR/last_failure
-  emphasize -r "Command '$@' finished with non-zero status: $STATUS"
+    cp $LOGFILE $WORKING_DIR/last_failure
+    emphasize -r "Command '$@' finished with non-zero status: $STATUS"
 else
-  cp $LOGFILE $WORKING_DIR/last_success
-  emphasize -b "Command '$@' finished with zero status"
+    cp $LOGFILE $WORKING_DIR/last_success
+    emphasize -b "Command '$@' finished with zero status"
 fi
 
 # file based on status and run time
 if [ $STATUS -eq 0 ] ; then
-  elapsed=`parse_time $LOGFILE`
-  if [ ! -f $WORKING_DIR/fastest_time ] ; then
-    cp $LOGFILE $WORKING_DIR/fastest_log
-    echo $elapsed > $WORKING_DIR/fastest_time
-    cp $LOGFILE $WORKING_DIR/slowest_log
-    echo $elapsed > $WORKING_DIR/slowest_time
-  else
-    slowest=`cat $WORKING_DIR/slowest_time`
-    fastest=`cat $WORKING_DIR/fastest_time`
-    if [ $(awk -v elapsed=$elapsed -v slowest=$slowest 'BEGIN{ if (elapsed>slowest) printf(1); else printf(0);}') == 1 ] ; then
-      cp $LOGFILE $WORKING_DIR/slowest_log
-      echo $elapsed > $WORKING_DIR/slowest_time
-    elif [ $(awk -v elapsed=$elapsed -v fastest=$fastest 'BEGIN{ if (elapsed<fastest) printf(1); else printf(0);}') == 1 ] ; then
-      cp $LOGFILE $WORKING_DIR/fastest_log
-      echo $elapsed > $WORKING_DIR/fastest_time
+    elapsed=`parse_time $LOGFILE`
+    if [ ! -f $WORKING_DIR/fastest_time ] ; then
+        cp $LOGFILE $WORKING_DIR/fastest_log
+        echo $elapsed > $WORKING_DIR/fastest_time
+        cp $LOGFILE $WORKING_DIR/slowest_log
+        echo $elapsed > $WORKING_DIR/slowest_time
+    else
+        slowest=`cat $WORKING_DIR/slowest_time`
+        fastest=`cat $WORKING_DIR/fastest_time`
+        if [ $(awk -v elapsed=$elapsed -v slowest=$slowest 'BEGIN{ if (elapsed>slowest) printf(1); else printf(0);}') == 1 ] ; then
+            cp $LOGFILE $WORKING_DIR/slowest_log
+            echo $elapsed > $WORKING_DIR/slowest_time
+        elif [ $(awk -v elapsed=$elapsed -v fastest=$fastest 'BEGIN{ if (elapsed<fastest) printf(1); else printf(0);}') == 1 ] ; then
+            cp $LOGFILE $WORKING_DIR/fastest_log
+            echo $elapsed > $WORKING_DIR/fastest_time
+        fi
     fi
-  fi
 fi
 
 exit $STATUS
