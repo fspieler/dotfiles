@@ -7,7 +7,7 @@ if [[ $# -ge 1 ]] ; then
 fi
 
 tmux_run () {
-   tmux -2uS  ~/.tmux.socket.$HOSTNAME.$session "$@"
+   tmux -2uS  ~/.tmux.socket.$HOSTNAME "$@"
 }
 
 tmux_run a -t $session
