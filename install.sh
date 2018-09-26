@@ -26,8 +26,7 @@ if [[ $? == 0 ]] ; then
     DEV_STUFF="vim tmux git"
     C_STUFF="gcc g++ cmake clang libgtest-dev"
     PYTHON_STUFF="python python-dev python-pip python3 python3-dev python3-pip"
-    NODE_STUFF="nodejs npm"
-    sudo apt-get -y install $TRASH $BUILD_STUFF $DEV_STUFF $C_STUFF $PYTHON_STUFF $NODE_STUFF
+    sudo apt-get -y install $TRASH $BUILD_STUFF $DEV_STUFF $C_STUFF $PYTHON_STUFF
 fi
 # }
 
@@ -71,7 +70,7 @@ create_link gitconfig ~/.gitconfig
 # }
 
 # { vim config
-create_link vim/vimrc ~/.virmc
+create_link vim/vimrc ~/.vimrc
 create_link vim/solarized.vim ~/.vim/colors/solarized.vim
 
     # { Vundle set-up
