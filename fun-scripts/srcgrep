@@ -5,4 +5,4 @@ else
   remaining="${@:2}"
 fi
 
-egrep $1 -r -i -n --include=*.{cpp,h,c} "$remaining"
+egrep $1 -r -i -n --include=*.{cpp,h,c,py} "$remaining"
