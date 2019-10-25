@@ -92,6 +92,7 @@ set_colors () {
   time_24h_color=$white
   username_color=$orange
   path_short_color=$red
+  virtualenv_color=$pink
   path_full_color=$red
   path_full_abbr_color=$red
   bg_job_num_color=$dark_red
@@ -120,7 +121,7 @@ set_prompts () {
   # For example, if git is not present on a machine, running $git_ps1_condition will return a non-zero
   # error code, so $git_ps1 will be removed from consideration. This ensures that prompt will only be chosen
   # on machines that support git.
-  full_ps1="\n$exit_status$hist $bg_job_num$time_12h $username_rainbow$at_hostname $path_full_gradient$git $end_gt_nl"
+  full_ps1="\n$exit_status$hist $bg_job_num$time_24h $username_rainbow$at_hostname $path_full_gradient$git $virtualenv$end_gt_nl"
   git_condition="type __git_ps1"
   rainbowfy_condition="type rainbowfy"
   colorpwd_condition="type colorpwd"

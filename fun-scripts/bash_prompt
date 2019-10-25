@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /etc/bash_completion.d/git-prompt
+
 # { colors
 bldblu='\[\033[1;34m\]' # Blue
 bldblk='\[\033[1;38;5;16m\]' # Black - Bold
@@ -51,6 +53,9 @@ bg_jobs () {
   jobnum=$(jobs -p | wc -l)
   [[ $jobnum -gt 0 ]] && ( [[ $jobnum -gt 1 ]] && echo "$jobnum bg jobs " || echo "1 bg job " )
 }
+detect_virtualenv () {
+  [[ ! -z $VIRTUAL_ENV ]] && echo "(venv $(python --version |& awk '{print $2}') $VIRTUAL_ENV)"
+}
 initialize_component_color time_12h "\T"
 initialize_component_color time_12a "\@"
 initialize_component_color time_24h "\t"
@@ -61,6 +66,7 @@ initialize_component_color path_short "\W"
 initialize_component_color path_full_abbr "\w"
 initialize_component_color path_full "\$(pwd)"
 path_full_gradient="\$(colorpwd)$Color_Off"
+initialize_component_color virtualenv "\$(detect_virtualenv)"
 initialize_component_color bg_job_num "\$(bg_jobs)"
 initialize_component_color hist "!\!"
 initialize_component_color at_hostname "@\h"
